@@ -310,8 +310,21 @@ export default function ReviewerPage() {
     }
   };
 
-  // Cleanup on unmount
+  // Preload all emoji images for instant switching on rapid clicks & cleanup on unmount
   useEffect(() => {
+    const emojiList = [
+      '/emoji-default.png',
+      '/emoji-1.png',
+      '/emoji-2.png',
+      '/emoji-3.png',
+      '/emoji-4.png',
+      '/emoji-5.png',
+    ];
+    emojiList.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (stepRef.current) clearInterval(stepRef.current);
@@ -380,17 +393,19 @@ export default function ReviewerPage() {
 
       {/* BRH Header — positioned at top-left of the page */}
       <header className="w-full flex items-center justify-start px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 pt-4 sm:pt-6 md:pt-7 lg:pt-8 z-20 shrink-0">
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-11 md:h-11 lg:w-12 lg:h-12 flex flex-col items-center justify-center shrink-0">
-            <a href='https://brh.geloratech.com/' target='_blank'>
+        <a href='https://brh.geloratech.com/' target='_blank'>
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-11 md:h-11 lg:w-12 lg:h-12 flex flex-col items-center justify-center shrink-0">
+
               <img src="/brh-logo.png" alt="BRH Logo" className="w-full h-full object-contain" />
-            </a>
+
+            </div>
+            <div className="flex flex-col min-w-0 justify-center">
+              <span className="font-extrabold text-[15px] sm:text-base md:text-lg lg:text-xl leading-tight text-gray-900 tracking-tight">BRH</span>
+              <span className="text-[9px] sm:text-[10px] md:text-[11px] lg:text-xs font-bold text-gray-500 tracking-wider uppercase leading-tight mt-0.5">BUSINESS REVIEW HELPER</span>
+            </div>
           </div>
-          <div className="flex flex-col min-w-0 justify-center">
-            <span className="font-extrabold text-[15px] sm:text-base md:text-lg lg:text-xl leading-tight text-gray-900 tracking-tight">BRH</span>
-            <span className="text-[9px] sm:text-[10px] md:text-[11px] lg:text-xs font-bold text-gray-500 tracking-wider uppercase leading-tight mt-0.5">BUSINESS REVIEW HELPER</span>
-          </div>
-        </div>
+        </a>
       </header>
 
       <main className="relative z-10 w-full min-w-0 max-w-[30rem] md:max-w-[33.75rem] lg:max-w-[52rem] xl:max-w-[56rem] px-4 sm:px-6 xl:px-8 pt-2 sm:pt-4 md:pt-4 pb-6 sm:pb-10 flex flex-col items-center my-auto lg:my-0">
@@ -428,11 +443,33 @@ export default function ReviewerPage() {
           <div className="bg-white pt-6 sm:pt-7 pb-5 sm:pb-6 px-3 sm:px-4 relative z-10 flex flex-col items-center">
             {/* 3D Emoji (default cute emoji with sparkles/beams, or selected rating emoji) */}
             <div className="absolute -top-[4rem] sm:-top-[4.5rem] md:-top-[5rem] w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center z-20 pointer-events-none">
+              {/* Default Emoji */}
               <img
-                src={selectedRating === null ? "/emoji-default.png" : `/emoji-${selectedRating}.png`}
-                alt={selectedRating === null ? "Default Rating Emoji" : ratingLabels[selectedRating - 1]}
-                className="w-full h-full object-contain drop-shadow-xl"
+                src="/emoji-default.png"
+                alt="Default Rating Emoji"
+                loading="eager"
+                decoding="sync"
+                className={`absolute inset-0 w-full h-full object-contain drop-shadow-xl transition-all duration-150 ${
+                  selectedRating === null
+                    ? 'opacity-100 scale-100'
+                    : 'opacity-0 scale-75 pointer-events-none'
+                }`}
               />
+              {/* Star Rating Emojis (1 to 5) - Pre-rendered for 0ms instantaneous response on rapid clicks */}
+              {[1, 2, 3, 4, 5].map((ratingVal) => (
+                <img
+                  key={ratingVal}
+                  src={`/emoji-${ratingVal}.png`}
+                  alt={ratingLabels[ratingVal - 1]}
+                  loading="eager"
+                  decoding="sync"
+                  className={`absolute inset-0 w-full h-full object-contain drop-shadow-xl transition-all duration-150 ${
+                    selectedRating === ratingVal
+                      ? 'opacity-100 scale-100 animate-[emojiPop_0.25s_cubic-bezier(0.34,1.56,0.64,1)]'
+                      : 'opacity-0 scale-75 pointer-events-none'
+                  }`}
+                />
+              ))}
             </div>
 
             {/* Stars row */}

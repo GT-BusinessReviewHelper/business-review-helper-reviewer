@@ -23,6 +23,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased overflow-x-hidden`}
     >
+      <head>
+        <link rel="preload" href="/emoji-default.png" as="image" />
+        <link rel="preload" href="/emoji-1.png" as="image" />
+        <link rel="preload" href="/emoji-2.png" as="image" />
+        <link rel="preload" href="/emoji-3.png" as="image" />
+        <link rel="preload" href="/emoji-4.png" as="image" />
+        <link rel="preload" href="/emoji-5.png" as="image" />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-[#F8F9FC] text-gray-900 overflow-x-hidden">
         {children}
       </body>
